@@ -13,8 +13,8 @@
                         <Option value="Sybase">Sybase</Option>
                     </Select>
                     <Button @click="editDatabaseConnect">编辑...</Button>
-                    <Button @click="newModal = true">新建...</Button>
-                    <Button @click="wizardModal = true">Wizard...</Button>
+                    <Button @click="newModalShow(true)">新建...</Button>
+                    <Button @click="wizardModalShow(true)">Wizard...</Button>
                 </FormItem>
                 <FormItem label="SQL">
                     <Button @click="getsqlQuery">获取SQL查询语句...</Button>
@@ -58,8 +58,8 @@
                 <Button type="ghost" size="small" @click="cancel">取消(C)</Button>
             </div>
         </Modal>
-        <edit-database v-if="isEditDatabase" @okCallback="okCallbackExecute" @cancelCallback="cancelCallbackExecute" :editDatabase="isEditDatabase"></edit-database>
-        <sql-query v-if="isGetsql" @cancelQuery="cancelQueryExecute" :getQuery="isGetsql"></sql-query>
+        <edit-database v-if="editDatabase"></edit-database>
+        <sql-query v-if="isGetsql"></sql-query>
         <Modal v-model="isReview" @on-ok="okReview" @on-cancel="cancelReview">
             <p slot="header">
                 <Icon type="arrow-expand"></Icon>
@@ -96,8 +96,8 @@
             <h3>表输入</h3>
             <div slot="footer"></div>
         </Modal>
-        <newModal v-if="newModal" :newModal="newModal"></newModal>
-        <wizardModal  v-if="wizardModal" :wizardModal="wizardModal"></wizardModal>
+        <newModal v-if="newModal"></newModal>
+        <wizardModal  v-if="wizardModal"></wizardModal>
     </div>
 </template>
 
@@ -110,7 +110,6 @@
     import { mapState } from 'vuex';
     export default {
         name: 'editPage',
-        // props: ['edit'],
         components: {
             editDatabase,
             sqlQuery,
@@ -120,10 +119,6 @@
         data () {
             return {
                 number: 1000,
-                newModal: false,
-                wizardModal: false,
-                isEditDatabase: false,
-                isGetsql: false,
                 isReview: false,
                 isReviewData: false,
                 isReviewLog: false,
@@ -246,10 +241,22 @@
             };
         },
         computed: {
-            ...mapState(['edit'])
+            ...mapState([
+                'edit',
+                'newModal',
+                'wizardModal',
+                'editDatabase',
+                'isGetsql'
+            ])
         },
         methods: {
-            ...mapMutations(['show']),
+            ...mapMutations([
+                'show',
+                'newModalShow',
+                'wizardModalShow',
+                'editDataBaseCallbackExecute',
+                'sqlQueryShow'
+            ]),
             help () {
                 this.helpMsg = true;
                 // this.$emit('show', false);
@@ -265,24 +272,12 @@
                 // this.$emit('show', false);
             },
             editDatabaseConnect () {
-                this.isEditDatabase = true;
+                this.editDataBaseCallbackExecute(true);
                 console.log('编辑数据库连接');
             },
-            okCallbackExecute (value) {
-                this.isEditDatabase = value;
-                console.log(value);
-            },
-            cancelCallbackExecute (value) {
-                this.isEditDatabase = value;
-                console.log(value);
-            },
             getsqlQuery (){
-                this.isGetsql = true;
+                this.sqlQueryShow(true);
                 console.log('获取SQL查询语句');
-            },
-            cancelQueryExecute (value) {
-                this.isGetsql = value;
-                console.log(value);
             },
             okReview () {
                 console.log('确定还有一个弹框');
